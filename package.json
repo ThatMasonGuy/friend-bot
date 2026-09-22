@@ -1,0 +1,20 @@
+{
+  "name": "friends-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A Discord bot with commands contributed as independent files.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "check": "node --check src/index.js && node --check src/command-loader.js && node --check commands/help.js && node --check commands/ping.js && node --check commands/reload.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.2"
+  }
+}
