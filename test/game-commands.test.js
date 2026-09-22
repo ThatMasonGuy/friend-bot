@@ -40,7 +40,13 @@ test('game commands respond with valid embeds', async () => {
     assert.ok(data.title);
     assert.ok(data.color);
   }
-  assert.equal(replies[2].embeds[0].toJSON().fields.length, 6);
+  const statFields = replies[2].embeds[0].toJSON().fields;
+  assert.equal(statFields.length, 7);
+  const scoreSum = statFields
+    .slice(0, 6)
+    .reduce((sum, field) => sum + Number(field.name.match(/: (\d+)$/)[1]), 0);
+  assert.equal(statFields[6].name, '📊 Total');
+  assert.equal(statFields[6].value, `**${scoreSum}**`);
 });
 
 test('help explains every command with examples in an embed', async () => {

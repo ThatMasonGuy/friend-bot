@@ -18,6 +18,7 @@ module.exports = {
       const rolls = Array.from({ length: 4 }, () => randomInt(1, 7)).sort((a, b) => a - b);
       return { name, rolls, total: rolls.slice(1).reduce((sum, roll) => sum + roll, 0) };
     });
+    const abilityTotal = stats.reduce((sum, stat) => sum + stat.total, 0);
 
     const embed = new EmbedBuilder()
       .setColor(0x9b59b6)
@@ -30,6 +31,11 @@ module.exports = {
           inline: true,
         })),
       )
+      .addFields({
+        name: '📊 Total',
+        value: `**${abilityTotal}**`,
+        inline: false,
+      })
       .setFooter({ text: `Requested by ${message.author.username}` })
       .setTimestamp();
 
