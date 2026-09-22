@@ -11,10 +11,12 @@ const {
   PermissionFlagsBits,
 } = require('discord.js');
 const { loadCommands } = require('./command-loader');
+const { saveReloadState, takeReloadState } = require('./reload-state');
 
 const execFileAsync = promisify(execFile);
 const projectDirectory = path.resolve(__dirname, '..');
 const commandsDirectory = path.join(projectDirectory, 'commands');
+const reloadStatePath = path.join(projectDirectory, '.reload-state.json');
 const prefix = process.env.COMMAND_PREFIX || '!';
 
 if (!process.env.DISCORD_TOKEN) {
@@ -44,6 +46,9 @@ let reloadInProgress = false;
 client.once(Events.ClientReady, (readyClient) => {
   const commandNames = [...new Set([...commands.values()].map((command) => command.name))];
   console.log(`Ready as ${readyClient.user.tag}; loaded: ${commandNames.join(', ')}`);
+  announceRestartComplete(readyClient).catch((error) => {
+    console.error('Could not announce completed restart:', error);
+  });
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -99,6 +104,11 @@ async function reloadFromGit(message) {
       maxBuffer: 1024 * 1024,
     });
     result = [stdout, stderr].join('\n').trim() || 'Git pull completed.';
+    saveReloadState(reloadStatePath, {
+      channelId: message.channelId,
+      requestedBy: message.author.username,
+      createdAt: Date.now(),
+    });
   } catch (error) {
     reloadInProgress = false;
     const details = [error.stdout, error.stderr, error.message].filter(Boolean).join('\n').trim();
@@ -114,6 +124,24 @@ async function reloadFromGit(message) {
     .reply({ embeds: [embed] })
     .catch((error) => console.error('Could not send reload confirmation:', error));
   setTimeout(() => process.exit(0), 750).unref();
+}
+
+async function announceRestartComplete(readyClient) {
+  const state = takeReloadState(reloadStatePath);
+  if (!state) return;
+
+  const channel = await readyClient.channels.fetch(state.channelId);
+  if (!channel?.isTextBased() || typeof channel.send !== 'function') {
+    throw new Error(`Reload channel ${state.channelId} is not a text channel.`);
+  }
+
+  const embed = new EmbedBuilder()
+    .setColor(0x57f287)
+    .setTitle('✅ Restart Complete')
+    .setDescription('The bot is back online and the latest commands are ready to use.')
+    .setFooter({ text: `Reload requested by ${state.requestedBy}` })
+    .setTimestamp();
+  await channel.send({ embeds: [embed] });
 }
 
 function canReload(message) {
