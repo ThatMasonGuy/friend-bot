@@ -45,6 +45,11 @@ test('game commands respond with valid embeds', async () => {
   const scoreSum = statFields
     .slice(0, 6)
     .reduce((sum, field) => sum + Number(field.name.match(/: (\d+)$/)[1]), 0);
+  assert.deepEqual(
+    statFields.slice(0, 6).map((field) => field.name.replace(/: \d+$/, '')),
+    ['🎲 Roll 1', '🎲 Roll 2', '🎲 Roll 3', '🎲 Roll 4', '🎲 Roll 5', '🎲 Roll 6'],
+  );
+  assert.ok(statFields.slice(0, 6).every((field) => field.inline === false));
   assert.equal(statFields[6].name, '📊 Total');
   assert.equal(statFields[6].value, `**${scoreSum}**`);
 });
