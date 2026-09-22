@@ -12,9 +12,9 @@ module.exports = {
       throw new Error('`!randchar` does not take any arguments.');
     }
 
-    const stats = Array.from({ length: 6 }, (_, index) => {
+    const stats = Array.from({ length: 6 }, () => {
       const rolls = Array.from({ length: 4 }, () => randomInt(1, 7)).sort((a, b) => a - b);
-      return { index: index + 1, rolls, total: rolls.slice(1).reduce((sum, roll) => sum + roll, 0) };
+      return { rolls, total: rolls.slice(1).reduce((sum, roll) => sum + roll, 0) };
     });
     const abilityTotal = stats.reduce((sum, stat) => sum + stat.total, 0);
 
@@ -23,12 +23,13 @@ module.exports = {
       .setTitle('🧙 Random Character Stats')
       .setDescription('Six sets of **4d6**, with the lowest die in each set discarded.')
       .addFields(
-        stats.map(({ index, rolls, total }) => ({
-          name: `🎲 Roll ${index}: ${total}`,
+        stats.map(({ rolls, total }) => ({
+          name: '\u200b',
           value: `~~${rolls[0]}~~ + ${rolls.slice(1).join(' + ')} = **${total}**`,
           inline: false,
         })),
       )
+      .addFields({ name: '\u200b', value: '\u200b', inline: false })
       .addFields({
         name: '📊 Total',
         value: `**${abilityTotal}**`,
