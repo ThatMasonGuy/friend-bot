@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "check": "node --check src/index.js && node --check src/command-loader.js && node --check commands/help.js && node --check commands/ping.js && node --check commands/reload.js",
+    "check": "node --check src/index.js && node --check src/command-loader.js && node --check commands/coinflip.js && node --check commands/dice.js && node --check commands/help.js && node --check commands/ping.js && node --check commands/randchar.js && node --check commands/reload.js",
     "test": "node --test"
   },
   "engines": {

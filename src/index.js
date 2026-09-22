@@ -5,6 +5,7 @@ const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 const {
   Client,
+  EmbedBuilder,
   Events,
   GatewayIntentBits,
   PermissionFlagsBits,
@@ -73,7 +74,11 @@ client.on(Events.MessageCreate, async (message) => {
   } catch (error) {
     console.error(`Command ${commandName} failed:`, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    await message.reply(`Command failed: ${errorMessage.slice(0, 1_500)}`).catch(() => {});
+    const embed = new EmbedBuilder()
+      .setColor(0xed4245)
+      .setTitle('❌ Command Failed')
+      .setDescription(errorMessage.slice(0, 4_000));
+    await message.reply({ embeds: [embed] }).catch(() => {});
   }
 });
 
@@ -100,8 +105,13 @@ async function reloadFromGit(message) {
     throw new Error(`Update failed; the bot is still running.\n${details.slice(0, 1_300)}`);
   }
 
+  const embed = new EmbedBuilder()
+    .setColor(0x57f287)
+    .setTitle('✅ Update Complete')
+    .setDescription(`\`\`\`\n${result.slice(0, 3_500)}\n\`\`\``)
+    .setFooter({ text: 'Restarting now…' });
   await message
-    .reply(`Update complete. Restarting…\n\`\`\`\n${result.slice(0, 1_500)}\n\`\`\``)
+    .reply({ embeds: [embed] })
     .catch((error) => console.error('Could not send reload confirmation:', error));
   setTimeout(() => process.exit(0), 750).unref();
 }

@@ -22,6 +22,12 @@ Requirements: Node.js 20+, Git, and PM2. This directory must be a Git clone with
 
 5. Run `!ping` or `!help` in Discord.
 
+Built-in game commands include:
+
+- `!coinflip [count]` — flip up to 100 coins (`!coin` also works)
+- `!dice [count]d<sides>` — roll dice, such as `!dice 4d6` or `!dice d20`
+- `!randchar` — roll six D&D-style ability scores using 4d6 and drop the lowest
+
 Useful operations:
 
 ```sh

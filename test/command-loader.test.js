@@ -9,6 +9,9 @@ test('loads command names and aliases', () => {
   const commands = loadCommands(path.resolve(__dirname, '../commands'));
   assert.equal(commands.get('ping').name, 'ping');
   assert.equal(commands.get('commands').name, 'help');
+  assert.equal(commands.get('coin').name, 'coinflip');
+  assert.equal(commands.get('roll').name, 'dice');
+  assert.equal(commands.get('stats').name, 'randchar');
   assert.equal(commands.get('reload').name, 'reload');
 });
 
