@@ -40,16 +40,18 @@ test('game commands respond with valid embeds', async () => {
     assert.ok(data.title);
     assert.ok(data.color);
   }
-  const statFields = replies[2].embeds[0].toJSON().fields;
-  assert.equal(statFields.length, 8);
-  const scoreSum = statFields
-    .slice(0, 6)
-    .reduce((sum, field) => sum + Number(field.value.match(/= \*\*(\d+)\*\*$/)[1]), 0);
-  assert.ok(statFields.slice(0, 6).every((field) => field.name === '\u200b'));
-  assert.ok(statFields.slice(0, 6).every((field) => field.inline === false));
-  assert.deepEqual(statFields[6], { name: '\u200b', value: '\u200b', inline: false });
-  assert.equal(statFields[7].name, '📊 Total');
-  assert.equal(statFields[7].value, `**${scoreSum}**`);
+  const statEmbed = replies[2].embeds[0].toJSON();
+  const lines = statEmbed.description.split('\n');
+  const rollLines = lines.slice(2, 8);
+  assert.equal(rollLines.length, 6);
+  assert.ok(rollLines.every((line) => /^~~\d~~ \+ \d \+ \d \+ \d = \*\*\d+\*\*$/.test(line)));
+  assert.equal(lines[8], '');
+  const scoreSum = rollLines.reduce(
+    (sum, line) => sum + Number(line.match(/= \*\*(\d+)\*\*$/)[1]),
+    0,
+  );
+  assert.equal(lines[9], `📊 **Total: ${scoreSum}**`);
+  assert.equal(statEmbed.fields, undefined);
 });
 
 test('help explains every command with examples in an embed', async () => {
